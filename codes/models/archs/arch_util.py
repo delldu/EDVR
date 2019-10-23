@@ -30,7 +30,7 @@ def make_layer(block, n_layers):
         layers.append(block())
     return nn.Sequential(*layers)
 
-
+# xxxx1111
 class ResidualBlock_noBN(nn.Module):
     '''Residual block w/o BN
     ---Conv-ReLU-Conv-+-

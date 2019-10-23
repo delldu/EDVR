@@ -8,6 +8,7 @@ from torch.autograd.function import once_differentiable
 from torch.nn.modules.utils import _pair
 
 from . import deform_conv_cuda
+import pdb
 
 logger = logging.getLogger('base')
 
@@ -254,7 +255,7 @@ class ModulatedDeformConv(nn.Module):
                                      self.padding, self.dilation, self.groups,
                                      self.deformable_groups)
 
-
+#xxxx1111
 class ModulatedDeformConvPack(ModulatedDeformConv):
     def __init__(self, *args, extra_offset_mask=False, **kwargs):
         super(ModulatedDeformConvPack, self).__init__(*args, **kwargs)

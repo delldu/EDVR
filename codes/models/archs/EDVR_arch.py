@@ -8,8 +8,9 @@ try:
     from models.archs.dcn.deform_conv import ModulatedDeformConvPack as DCN
 except ImportError:
     raise ImportError('Failed to import DCNv2 module.')
+import pdb
 
-
+#xxxx1111
 class Predeblur_ResNet_Pyramid(nn.Module):
     def __init__(self, nf=128, HR_in=False):
         '''
@@ -56,7 +57,7 @@ class Predeblur_ResNet_Pyramid(nn.Module):
         out = self.RB_L1_5(self.RB_L1_4(self.RB_L1_3(L1_fea)))
         return out
 
-
+#xxxx1111, 0.3
 class PCD_Align(nn.Module):
     ''' Alignment module using Pyramid, Cascading and Deformable convolution
     with 3 pyramid levels.
@@ -127,7 +128,7 @@ class PCD_Align(nn.Module):
 
         return L1_fea
 
-
+#xxxx1111, 0.1 + 0.3
 class TSA_Fusion(nn.Module):
     ''' Temporal Spatial Attention fusion module
     Temporal: correlation;
@@ -202,7 +203,7 @@ class TSA_Fusion(nn.Module):
         fea = fea * att * 2 + att_add
         return fea
 
-
+#xxxx1111
 class EDVR(nn.Module):
     def __init__(self, nf=64, nframes=5, groups=8, front_RBs=5, back_RBs=10, center=None,
                  predeblur=False, HR_in=False, w_TSA=True):

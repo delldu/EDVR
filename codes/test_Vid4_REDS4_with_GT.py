@@ -14,6 +14,7 @@ import utils.util as util
 import data.util as data_util
 import models.archs.EDVR_arch as EDVR_arch
 
+import pdb
 
 def main():
     #################
@@ -71,6 +72,8 @@ def main():
     if stage == 2:
         HR_in = True
         back_RBs = 20
+
+    # xxxx1111
     model = EDVR_arch.EDVR(128, N_in, 8, 5, back_RBs, predeblur=predeblur, HR_in=HR_in)
 
     #### dataset
