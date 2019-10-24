@@ -1,8 +1,8 @@
-import math
 from collections import Counter
 from collections import defaultdict
 import torch
 from torch.optim.lr_scheduler import _LRScheduler
+import math
 
 
 class MultiStepLR_Restart(_LRScheduler):
@@ -60,8 +60,7 @@ class CosineAnnealingLR_Restart(_LRScheduler):
             ]
         return [(1 + math.cos(math.pi * (self.last_epoch - self.last_restart) / self.T_max)) /
                 (1 + math.cos(math.pi * ((self.last_epoch - self.last_restart) - 1) / self.T_max)) *
-                (group['lr'] - self.eta_min) + self.eta_min
-                for group in self.optimizer.param_groups]
+                (group['lr'] - self.eta_min) + self.eta_min for group in self.optimizer.param_groups]
 
 
 if __name__ == "__main__":
@@ -70,17 +69,17 @@ if __name__ == "__main__":
     ##############################
     # MultiStepLR_Restart
     ##############################
-    ## Original
+    # Original
     lr_steps = [200000, 400000, 600000, 800000]
     restarts = None
     restart_weights = None
 
-    ## two
+    # two
     lr_steps = [100000, 200000, 300000, 400000, 490000, 600000, 700000, 800000, 900000, 990000]
     restarts = [500000]
     restart_weights = [1]
 
-    ## four
+    # four
     lr_steps = [
         50000, 100000, 150000, 200000, 240000, 300000, 350000, 400000, 450000, 490000, 550000,
         600000, 650000, 700000, 740000, 800000, 850000, 900000, 950000, 990000
@@ -94,12 +93,12 @@ if __name__ == "__main__":
     ##############################
     # Cosine Annealing Restart
     ##############################
-    ## two
+    # two
     T_period = [500000, 500000]
     restarts = [500000]
     restart_weights = [1]
 
-    ## four
+    # four
     T_period = [250000, 250000, 250000, 250000]
     restarts = [250000, 500000, 750000]
     restart_weights = [1, 1, 1]
@@ -129,7 +128,7 @@ if __name__ == "__main__":
     plt.subplot(111)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     plt.title('Title', fontsize=16, color='k')
-    plt.plot(list(range(N_iter)), lr_l, linewidth=1.5, label='learning rate scheme')
+    plt.plot(list(range(N_iter)), lr_l, linewidth=1.5, label='lr scheme')
     legend = plt.legend(loc='upper right', shadow=False)
     ax = plt.gca()
     labels = ax.get_xticks().tolist()

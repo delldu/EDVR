@@ -28,8 +28,8 @@ def main():
     #        blur (deblur-clean), blur_comp (deblur-compression).
     stage = 1  # 1 or 2, use two stage strategy for REDS dataset.
     flip_test = False
-    ############################################################################
-    #### model
+    # ###########################################################################
+    # ### model
     if data_mode == 'Vid4':
         if stage == 1:
             model_path = '../experiments/pretrained_models/EDVR_Vimeo90K_SR_L.pth'
@@ -75,8 +75,9 @@ def main():
 
     # xxxx1111
     model = EDVR_arch.EDVR(128, N_in, 8, 5, back_RBs, predeblur=predeblur, HR_in=HR_in)
+    # pdb.set_trace()
 
-    #### dataset
+    # dataset
     if data_mode == 'Vid4':
         test_dataset_folder = '../datasets/Vid4/BIx4'
         GT_dataset_folder = '../datasets/Vid4/GT'
@@ -88,7 +89,7 @@ def main():
             print('You should modify the test_dataset_folder path for stage 2')
         GT_dataset_folder = '../datasets/REDS4/GT'
 
-    #### evaluation
+    # evaluation
     crop_border = 0
     border_frame = N_in // 2  # border frames when evaluate
     # temporal padding mode
@@ -103,14 +104,14 @@ def main():
     util.setup_logger('base', save_folder, 'test', level=logging.INFO, screen=True, tofile=True)
     logger = logging.getLogger('base')
 
-    #### log info
+    # log info
     logger.info('Data: {} - {}'.format(data_mode, test_dataset_folder))
     logger.info('Padding mode: {}'.format(padding))
     logger.info('Model path: {}'.format(model_path))
     logger.info('Save images: {}'.format(save_imgs))
     logger.info('Flip test: {}'.format(flip_test))
 
-    #### set up the models
+    # set up the models
     model.load_state_dict(torch.load(model_path), strict=True)
     model.eval()
     model = model.to(device)
@@ -120,6 +121,18 @@ def main():
 
     subfolder_l = sorted(glob.glob(osp.join(test_dataset_folder, '*')))
     subfolder_GT_l = sorted(glob.glob(osp.join(GT_dataset_folder, '*')))
+    # pdb.set_trace()
+    # (Pdb) pp subfolder_l
+    # ['../datasets/Vid4/BIx4/calendar',
+    # '../datasets/Vid4/BIx4/city',
+    # '../datasets/Vid4/BIx4/foliage',
+    # '../datasets/Vid4/BIx4/walk']
+    # (Pdb) pp subfolder_GT_l
+    # ['../datasets/Vid4/GT/calendar',
+    # '../datasets/Vid4/GT/city',
+    # '../datasets/Vid4/GT/foliage',
+    # '../datasets/Vid4/GT/walk']
+
     # for each subfolder
     for subfolder, subfolder_GT in zip(subfolder_l, subfolder_GT_l):
         subfolder_name = osp.basename(subfolder)
@@ -131,9 +144,16 @@ def main():
         if save_imgs:
             util.mkdirs(save_subfolder)
 
-        #### read LQ and GT images
+        # (Pdb) pp save_subfolder
+        # '../results/Vid4/calendar'
+
+        # read LQ and GT images
         imgs_LQ = data_util.read_img_seq(subfolder)
         img_GT_l = []
+        # pdb.set_trace()
+        # (Pdb) pp img_path_l
+        # ['../datasets/Vid4/BIx4/calendar/00000000.png', ..., '../datasets/Vid4/BIx4/calendar/00000040.png']
+
         for img_GT_path in sorted(glob.glob(osp.join(subfolder_GT, '*'))):
             img_GT_l.append(data_util.read_img(None, img_GT_path))
 
@@ -149,6 +169,13 @@ def main():
                 output = util.flipx4_forward(model, imgs_in)
             else:
                 output = util.single_forward(model, imgs_in)
+
+            # pdb.set_trace()
+            # (Pdb) imgs_in.size()
+            # torch.Size([1, 7, 3, 144, 180])
+            # (Pdb) output.size()
+            # torch.Size([1, 3, 576, 720])
+
             output = util.tensor2img(output.squeeze(0))
 
             if save_imgs:
@@ -163,14 +190,20 @@ def main():
                 output = data_util.bgr2ycbcr(output, only_y=True)
 
             output, GT = util.crop_border([output, GT], crop_border)
-            crt_psnr = util.calculate_psnr(output * 255, GT * 255)
-            logger.info('{:3d} - {:25} \tPSNR: {:.6f} dB'.format(img_idx + 1, img_name, crt_psnr))
+
+            # pdb.set_trace()
+            # (Pdb) type(output), output.shape
+            # (<class 'numpy.ndarray'>, (576, 720))
+            # (Pdb) type(GT), GT.shape
+            # (<class 'numpy.ndarray'>, (576, 720))
+            current_psnr = util.calculate_psnr(output * 255, GT * 255)
+            logger.info('{:3d} - {:25} \tPSNR: {:.6f} dB'.format(img_idx + 1, img_name, current_psnr))
 
             if img_idx >= border_frame and img_idx < max_idx - border_frame:  # center frames
-                avg_psnr_center += crt_psnr
+                avg_psnr_center += current_psnr
                 N_center += 1
             else:  # border frames
-                avg_psnr_border += crt_psnr
+                avg_psnr_border += current_psnr
                 N_border += 1
 
         avg_psnr = (avg_psnr_center + avg_psnr_border) / (N_center + N_border)

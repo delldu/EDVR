@@ -29,26 +29,26 @@ def main():
     adapt_official = True if 'official' in model_path else False
     model = TOF_arch.TOFlow(adapt_official=adapt_official)
 
-    #### dataset
+    # ### dataset
     if data_mode == 'Vid4':
         test_dataset_folder = '../datasets/Vid4/BIx4up_direct/*'
     else:
         test_dataset_folder = '../datasets/REDS4/{}/*'.format(data_mode)
 
-    #### evaluation
+    # ### evaluation
     crop_border = 0
     border_frame = N_in // 2  # border frames when evaluate
     # temporal padding mode
     padding = 'new_info'  # different from the official setting
     save_imgs = True
-    ############################################################################
+    # ###########################################################################
     device = torch.device('cuda')
     save_folder = '../results/{}'.format(data_mode)
     util.mkdirs(save_folder)
     util.setup_logger('base', save_folder, 'test', level=logging.INFO, screen=True, tofile=True)
     logger = logging.getLogger('base')
 
-    #### log info
+    # ### log info
     logger.info('Data: {} - {}'.format(data_mode, test_dataset_folder))
     logger.info('Padding mode: {}'.format(padding))
     logger.info('Model path: {}'.format(model_path))
@@ -118,7 +118,7 @@ def main():
         return output
 
     sub_folder_l = sorted(glob.glob(test_dataset_folder))
-    #### set up the models
+    # ### set up the models
     model.load_state_dict(torch.load(model_path), strict=True)
     model.eval()
     model = model.to(device)
@@ -167,7 +167,7 @@ def main():
             if save_imgs:
                 cv2.imwrite(osp.join(save_sub_folder, '{:08d}.png'.format(c_idx)), output)
 
-            #### calculate PSNR
+            # ### calculate PSNR
             output = output / 255.
             GT = np.copy(img_GT_l[img_idx])
             # For REDS, evaluate on RGB channels; for Vid4, evaluate on Y channels
