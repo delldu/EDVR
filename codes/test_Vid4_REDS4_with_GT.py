@@ -22,11 +22,11 @@ def main():
     #################
     device = torch.device('cuda')
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    data_mode = 'Vid4'  # Vid4 | sharp_bicubic | blur_bicubic | blur | blur_comp
+    data_mode = 'sharp_bicubic'  # Vid4 | sharp_bicubic | blur_bicubic | blur | blur_comp
     # Vid4: SR
     # REDS4: sharp_bicubic (SR-clean), blur_bicubic (SR-blur);
     #        blur (deblur-clean), blur_comp (deblur-compression).
-    stage = 1  # 1 or 2, use two stage strategy for REDS dataset.
+    stage = 2  # 1 or 2, use two stage strategy for REDS dataset.
     flip_test = False
     # ###########################################################################
     # ### model
@@ -85,7 +85,9 @@ def main():
         if stage == 1:
             test_dataset_folder = '../datasets/REDS4/{}'.format(data_mode)
         else:
-            test_dataset_folder = '../results/REDS-EDVR_REDS_SR_L_flipx4'
+            # test_dataset_folder = '../results/REDS-EDVR_REDS_SR_L_flipx4'
+            test_dataset_folder = '../results/sharp_bicubic'
+
             print('You should modify the test_dataset_folder path for stage 2')
         GT_dataset_folder = '../datasets/REDS4/GT'
 
@@ -115,6 +117,8 @@ def main():
     model.load_state_dict(torch.load(model_path), strict=True)
     model.eval()
     model = model.to(device)
+
+    logger.info('Model: {}'.format(model))
 
     avg_psnr_l, avg_psnr_center_l, avg_psnr_border_l = [], [], []
     subfolder_name_l = []
